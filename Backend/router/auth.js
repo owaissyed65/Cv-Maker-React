@@ -13,7 +13,7 @@ Router.post('/auth/signup', async (req, res) => {
         }
         let userExist = await User.findOne({ email: email })
         if (userExist) {
-            return res.status(422).json({ error: 'User Already Exist' });
+            return res.status(402).json({ error: 'User Already Exist' });
         }
         // This is the method to covert password into hash salt
         // let salt = bcrypt.genSaltSync(10);

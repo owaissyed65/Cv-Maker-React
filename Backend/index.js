@@ -2,9 +2,11 @@ const express = require('express')
 const app = express()
 const connectToMongo = require('./db')
 const port = 5000
+const cors = require('cors')
 connectToMongo()
 // that will make json file as obj
 app.use(express.json())
+app.use(cors())
 // link to connect router
 app.use(require('./router/auth'))
 
