@@ -6,6 +6,7 @@ import Home from './Components/Home';
 import Contact from './Components/Contact';
 import Login from './Components/Login';
 import Signup from './Components/Signup';
+import Logout from './Components/Logout';
 const App = () => {
   return (
     <>
@@ -16,6 +17,7 @@ const App = () => {
         <Route exact path="/contact" element={<Contact />}></Route>
         <Route exact path="/login" element={<Login />}></Route>
         <Route exact path="/signup" element={<Signup />}></Route>
+        <Route exact path="/logout" element={<Logout/>}></Route>
       </Routes>
     </>
   )

@@ -1,8 +1,10 @@
+
 const express = require('express');
 const Router = express.Router()
 const User = require("../models/User")
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const authenticate = require('../middleware/authenticate');
 Router.post('/auth/signup', async (req, res) => {
     const { name, email, password, cpassword, phone, work } = req.body
 
@@ -41,9 +43,10 @@ Router.post('/auth/login', async (req, res) => {
             let userPassword = await bcrypt.compare(password, userLogin.password)
             token =await userLogin.generateAuthToken()
             console.log(token)
-            res.cookie('jwt',token,{
-                expires: new Date(Date.now()+25892000000),
-                httpOnly:true
+            await res.cookie('jwtoken',token,{
+                expires: new Date(Date.now()+2592000000),
+                httpOnly:true,
+
             })
             if (!userPassword) {
                 return res.status(400).json({ message: 'Invalid Credentials' })
@@ -61,5 +64,14 @@ Router.post('/auth/login', async (req, res) => {
     } catch (error) {
         res.status(500).send("Some error occured")
     }
+
+})
+
+Router.get('/auth/about',authenticate,async(req,res) =>{
+    res.json({user:req.findUser})
+})
+Router.get('/auth/logout',async(req,res) =>{
+    res.clearCookie('jwtoken',{path:'/'})
+    res.send(200).send("logout")
 })
 module.exports = Router
