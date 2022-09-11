@@ -29,9 +29,34 @@ const userSchema = new Schema({
         type: String,
         require: true
     },
+    Date: {
+        type: Date,
+        default: Date.now
+    },
     tokens: [
         {
             token: {
+                type: String,
+                require: true
+            }
+        }
+    ],
+    messages: [
+        {
+            name: {
+                type: String,
+                require: true
+            },
+            email: {
+                type: String,
+                require: true,
+                unique: true
+            },
+            phone: {
+                type:Number ,
+                require: true
+            },
+            message: {
                 type: String,
                 require: true
             }
@@ -45,16 +70,25 @@ userSchema.pre('save', async function (next) {
     }
     next()
 })
-userSchema.methods.generateAuthToken = async function (){
+userSchema.methods.generateAuthToken = async function () {
     try {
-        let token = await jwt.sign({_id:this._id},jsonwebtoken);
-        this.tokens = this.tokens.concat({token:token})
+        let token = await jwt.sign({ _id: this._id }, jsonwebtoken);
+        this.tokens = this.tokens.concat({ token: token })
         await this.save();
         // console.log(token)
         return token
     } catch (error) {
         console.log(error)
     }
-} 
+}
+userSchema.methods.sendMessage = async function (name,email,phone,msg) {
+    try {
+        this.messages = this.messages.concat({name,email,phone:phone,message:msg})
+        await this.save()
+        return this.messages;
+    } catch (error) {
+        console.log(error)
+    }
+}
 const User = mongoose.model('Users', userSchema)
 module.exports = User

@@ -41,11 +41,11 @@ Router.post('/auth/login', async (req, res) => {
         if (userLogin) {
 
             let userPassword = await bcrypt.compare(password, userLogin.password)
-            token =await userLogin.generateAuthToken()
+            token = await userLogin.generateAuthToken()
             console.log(token)
-            await res.cookie('jwtoken',token,{
-                expires: new Date(Date.now()+2592000000),
-                httpOnly:true,
+            await res.cookie('jwtoken', token, {
+                expires: new Date(Date.now() + 2592000000),
+                httpOnly: true,
 
             })
             if (!userPassword) {
@@ -67,11 +67,25 @@ Router.post('/auth/login', async (req, res) => {
 
 })
 
-Router.get('/auth/about',authenticate,async(req,res) =>{
-    res.json({user:req.findUser})
+Router.get('/auth/about', authenticate, async (req, res) => {
+    res.json({ user: req.findUser })
 })
-Router.get('/auth/logout',async(req,res) =>{
-    res.clearCookie('jwtoken',{path:'/'})
+Router.post('/auth/contact', authenticate, async (req, res) => {
+    try {
+        const { name, email, phone, msg } = req.body
+        if (!name || !email || !phone || !msg) {
+            res.status(402).json({ message: "No Message Provided" })
+        }
+        const checkUser = await User.findOne({ _id: req.userID, })
+        const Message = await checkUser.sendMessage(name, email, phone, msg)
+
+        res.status(201).json({ msg: checkUser.messages });
+    } catch (error) {
+        res.status(500).send(error)
+    }
+})
+Router.get('/auth/logout', async (req, res) => {
+    res.clearCookie('jwtoken', { path: '/' })
     res.send(200).send("logout")
 })
 module.exports = Router
