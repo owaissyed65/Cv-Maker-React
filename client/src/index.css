@@ -60,3 +60,47 @@ color: white;
     font-size: 1.1rem;
   }
 }
+.shadow{
+  position: absolute;
+  top:0px;
+ 
+}
+.pos{
+  position: relative !important;
+  top: 50px !important;;
+}
+@media (max-height:450px) {
+  .shadow{
+    position: absolute;
+    top:0px;
+   
+  }
+  .pos{
+    position: relative !important;
+    top: 150px !important;;
+  }
+  
+}
+@media (max-height:385px) {
+  .shadow{
+    position: absolute;
+    top:0px;
+   
+  }
+  .pos{
+    position: relative !important;
+    top: 200px !important;;
+  }
+  
+}
+.max{
+  position: relative;
+  top: -40px;
+}
+@media (max-height:485px){
+  .max{
+    position: relative;
+    top: 100px;
+  }
+  
+}

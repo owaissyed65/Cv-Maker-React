@@ -53,12 +53,16 @@ const userSchema = new Schema({
                 unique: true
             },
             phone: {
-                type:Number ,
+                type: Number,
                 require: true
             },
             message: {
                 type: String,
                 require: true
+            },
+            date: {
+                type: Date,
+                default: Date.now
             }
         }
     ]
@@ -81,9 +85,9 @@ userSchema.methods.generateAuthToken = async function () {
         console.log(error)
     }
 }
-userSchema.methods.sendMessage = async function (name,email,phone,msg) {
+userSchema.methods.sendMessage = async function (name, email, phone, message) {
     try {
-        this.messages = this.messages.concat({name,email,phone:phone,message:msg})
+        this.messages = this.messages.concat({ name, email, phone: phone, message: message })
         await this.save()
         return this.messages;
     } catch (error) {

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-
-
+import ContactInform from './ContactInform'
 const Contact = () => {
-  const [info, setInfo] = useState({ name: '', email: '', phone: '', msg: '' })
-  const [message, setMessage] = useState([]);
+  const [info, setInfo] = useState({ name: '', email: '', phone: '', message: '' })
+
+  const [value, setValue] = useState([]);
   const Aboutme = async () => {
     try {
 
@@ -16,14 +16,17 @@ const Contact = () => {
         credentials: 'include'
       })
       const data = await res.json()
-      console.log(data.user)
       const { user } = data;
+      const { messages } = user
+      setValue([...messages])
       setInfo({ name: user.name, email: user.email, phone: user.phone })
-      if (res.status === 401)
-        console.log(data)
+      if (res.status === 401) {
+
+      }
     } catch (error) {
       console.log(error)
     }
+
 
   }
   useEffect(() => {
@@ -35,22 +38,20 @@ const Contact = () => {
   }
   const postMsg = async (e) => {
     e.preventDefault()
-    const { name, email, msg, phone } = info
+    const { name, email, message, phone } = info
     let res = await fetch('/auth/contact', {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name: name, phone: phone, email: email, msg: msg, })
+      body: JSON.stringify({ name: name, phone: phone, email: email, message: message, })
     })
-    const data = await res.json()
-    setMessage({ msg: { message: data.msg } })
-    // console.log(res)
-    // console.log(data)
-    console.log(message)
+    await res.json()
+    setValue(value.concat(info))
+    console.log(value)
     if (res.status === 201) {
-      // window.alert(msg+" Message send Successfully")
-      setInfo({ name: '', email: '', msg: '', phone: '' })
+      window.alert("Message send Successfully")
+
     }
   }
   return (
@@ -72,7 +73,7 @@ const Contact = () => {
         </div>
       </div>
       <div className='d-flex justify-content-center align-items-center mb-5' style={{ height: '100vh' }}  >
-        <div className="shadow p-3 mb-5 bg-body rounded">
+        <div className="shadow pos p-3 mb-5 bg-body rounded">
           <h1 className='pb-3'>Get In Touch</h1>
           <div className="row g-3">
             <div className="col my-3">
@@ -86,14 +87,17 @@ const Contact = () => {
             </div>
           </div>
           <div className="mb-3">
-            <label htmlFor="msg" className="form-label">Message</label>
-            <textarea className="form-control" id="msg" name='msg' rows="5" value={info.msg} onChange={handleChange}></textarea>
+            <label htmlFor="message" className="form-label">Message</label>
+            <textarea className="form-control" id="message" name='message' rows="5" value={info.message} onChange={handleChange}></textarea>
           </div>
           <button className="btn btn-primary" type="submit" onClick={postMsg}>Send Message</button>
+        </div>
+      </div>
+      <div className='d-flex flex-column justify-content-center container w-50 max' style={{ border: '2px solid black' }}>
+        <div className='mx-5 top-0  '>
           <h2>Your messages</h2>
-          {message.msg.message.message.map((element,index)=>{
-            return element.message[index]
-          })}
+
+          {value.map((content, index) => { return <div key={index} ><ContactInform name={content.name} message={content.message} date={content.date} id={content._id}/> </div> })}
         </div>
       </div>
     </div>

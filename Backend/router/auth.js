@@ -5,6 +5,7 @@ const User = require("../models/User")
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authenticate = require('../middleware/authenticate');
+const { collection } = require('../models/User');
 Router.post('/auth/signup', async (req, res) => {
     const { name, email, password, cpassword, phone, work } = req.body
 
@@ -15,7 +16,7 @@ Router.post('/auth/signup', async (req, res) => {
         }
         let userExist = await User.findOne({ email: email })
         if (userExist) {
-            return res.status(402).json({ error: 'User Already Exist' });
+            return res.status(403).json({ error: 'User Already Exist' });
         }
         // This is the method to covert password into hash salt
         // let salt = bcrypt.genSaltSync(10);
@@ -25,7 +26,7 @@ Router.post('/auth/signup', async (req, res) => {
         await user.save();
         res.status(201).json({ newUser: { user: req.body }, userExist: { user: userExist } })
     } catch (error) {
-        res.status(500).send("Some error occured")
+        res.status(500).send(error)
     }
 
 })
@@ -42,7 +43,7 @@ Router.post('/auth/login', async (req, res) => {
 
             let userPassword = await bcrypt.compare(password, userLogin.password)
             token = await userLogin.generateAuthToken()
-            console.log(token)
+
             await res.cookie('jwtoken', token, {
                 expires: new Date(Date.now() + 2592000000),
                 httpOnly: true,
@@ -66,24 +67,47 @@ Router.post('/auth/login', async (req, res) => {
     }
 
 })
-
+// get data
 Router.get('/auth/about', authenticate, async (req, res) => {
     res.json({ user: req.findUser })
 })
+// get information
 Router.post('/auth/contact', authenticate, async (req, res) => {
     try {
-        const { name, email, phone, msg } = req.body
-        if (!name || !email || !phone || !msg) {
+        const { name, email, phone, message } = req.body
+        if (!name || !email || !phone || !message) {
             res.status(402).json({ message: "No Message Provided" })
         }
         const checkUser = await User.findOne({ _id: req.userID, })
-        const Message = await checkUser.sendMessage(name, email, phone, msg)
+        const Message = await checkUser.sendMessage(name, email, phone, message)
 
-        res.status(201).json({ msg: checkUser.messages });
+        res.status(201).json(checkUser);
     } catch (error) {
         res.status(500).send(error)
     }
 })
+
+// Router.delete('/auth/dlt/:id', authenticate, async (req, res) => {
+//     try {
+//         let message = await User.findOne({ 'messages._id': req.params.id })
+//         console.log("somethimg" + message)
+//         console.log(req.params.id)
+
+//         if (!message.messages) {
+//             return res.status(403).json({ message: 'No Message are found' });
+//         }
+//         if (!req.userID) {
+//             return res.status(402).json({ message: 'No Message are found' });
+//         }
+//         message.messages.pull({ _id: req.params.id }) // remove
+//         // contact.phone.pull(itemId); // this also works
+//         // let dltmessage = await User.deleteOne({'messages._id':req.params.id});
+//         console.log(dltmessage)
+//         res.status(200).json({ msg: 'dlt' })
+//     } catch (error) {
+//         res.status(500)
+//     }
+// })
 Router.get('/auth/logout', async (req, res) => {
     res.clearCookie('jwtoken', { path: '/' })
     res.send(200).send("logout")
