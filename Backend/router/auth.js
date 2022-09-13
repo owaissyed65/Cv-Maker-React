@@ -5,7 +5,7 @@ const User = require("../models/User")
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authenticate = require('../middleware/authenticate');
-const { collection } = require('../models/User');
+const { collection, db } = require('../models/User');
 Router.post('/auth/signup', async (req, res) => {
     const { name, email, password, cpassword, phone, work } = req.body
 
@@ -89,21 +89,19 @@ Router.post('/auth/contact', authenticate, async (req, res) => {
 
 // Router.delete('/auth/dlt/:id', authenticate, async (req, res) => {
 //     try {
-//         let message = await User.findOne({ 'messages._id': req.params.id })
-//         console.log("somethimg" + message)
-//         console.log(req.params.id)
+// let message = await User.findOne({ 'messages._id': req.params.id })
+// console.log("somethimg" + message)
+// console.log(req.params.id)
+// if (!message.messages) {
+//     return res.status(403).json({ message: 'No Message are found' });
+// }
+// if (!req.params.id) {
+//     return res.status(402).json({ message: 'No Message are found' });
+// }
+// await User.findOneAndDelete({'messages._id':req.params.id})
+// res.status(200).json({ msg: 'dlt' })
 
-//         if (!message.messages) {
-//             return res.status(403).json({ message: 'No Message are found' });
-//         }
-//         if (!req.userID) {
-//             return res.status(402).json({ message: 'No Message are found' });
-//         }
-//         message.messages.pull({ _id: req.params.id }) // remove
-//         // contact.phone.pull(itemId); // this also works
-//         // let dltmessage = await User.deleteOne({'messages._id':req.params.id});
-//         console.log(dltmessage)
-//         res.status(200).json({ msg: 'dlt' })
+
 //     } catch (error) {
 //         res.status(500)
 //     }
